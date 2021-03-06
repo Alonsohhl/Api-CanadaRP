@@ -9,11 +9,11 @@ const addressSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema(
   {
-    address: addressSchema,
-    email: String,
-    firstName: String,
-    lastName: String,
-    password: {
+    // address: addressSchema,
+    userEmail: String,
+    userName: String,
+    userLastName: String,
+    userPassword: {
       type: String,
       get: (): undefined => undefined,
     },
@@ -26,8 +26,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.virtual("fullName").get(function () {
-  return `${this.firstName} ${this.lastName}`;
+userSchema.virtual("userFullName").get(function () {
+  return `${this.userName} ${this.userLastName}`;
 });
 
 userSchema.virtual("posts", {

@@ -3,6 +3,8 @@ import NotAuthorizedException from "../exceptions/NotAuthorizedException";
 import Controller from "../interfaces/controller.interface";
 import RequestWithUser from "../interfaces/requestWithUser.interface";
 import authMiddleware from "../middleware/auth.middleware";
+import validationMiddleware from "../middleware/validation.middleware";
+import CreateUserDto from "./user.dto";
 // import postModel from '../post/post.model';
 import userModel from "./user.model";
 import UserNotFoundException from "../exceptions/UserNotFoundException";
@@ -19,6 +21,15 @@ class UserController implements Controller {
 
   private initializeRoutes() {
     this.router.get(`${this.path}/:id`, authMiddleware, this.getUserById);
+    this.router
+      //   .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
+      //   .delete(`${this.path}/:id`, this.deletePost)
+      .post(
+        this.path,
+        //authMiddleware,
+        validationMiddleware(CreateUserDto),
+        this.createUser
+      );
     // this.router.get(`${this.path}/:id/posts`, authMiddleware, this.getAllPostsOfUser);
   }
 
@@ -38,6 +49,17 @@ class UserController implements Controller {
     } else {
       next(new UserNotFoundException(id));
     }
+  };
+
+  private createUser = async (request: RequestWithUser, response: Response) => {
+    const userData: CreateUserDto = request.body;
+    const createdUser = new this.user({
+      ...userData,
+      // author: request.user._id,
+    });
+    const savedUser = await createdUser.save();
+    // await savedUser.populate("author", "-password").execPopulate();
+    response.send(savedUser);
   };
 
   //   private getAllPostsOfUser = async (request: RequestWithUser, response: Response, next: NextFunction) => {
